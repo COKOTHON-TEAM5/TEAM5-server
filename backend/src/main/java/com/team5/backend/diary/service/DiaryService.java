@@ -1,10 +1,7 @@
 package com.team5.backend.diary.service;
 
 import com.team5.backend.diary.domain.DiaryEntity;
-import com.team5.backend.diary.dto.DiaryRequest;
-import com.team5.backend.diary.dto.Emotion;
-import com.team5.backend.diary.dto.ReportResponse;
-import com.team5.backend.diary.dto.TimeRecordRequest;
+import com.team5.backend.diary.dto.*;
 import com.team5.backend.diary.repository.DiaryRepository;
 import com.team5.backend.exception.BadRequestException;
 import com.team5.backend.exception.NotFoundException;
@@ -14,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,7 +38,8 @@ public class DiaryService {
         diaryRepository.save(diary);
         memberRepository.save(member);
 
-        System.out.println("startSleep: " + getMember(username).getStatus());
+        MemberEntity test = getMember(username);
+        System.out.println(test.getUsername() + " startSleep: " + getMember(username).getStatus());
 
     }
 
@@ -56,7 +56,8 @@ public class DiaryService {
         diaryRepository.save(diary);
         memberRepository.save(member);
 
-        System.out.println("endSleep: " + getMember(username).getStatus());
+        MemberEntity test = getMember(username);
+        System.out.println(test.getUsername() + " endSleep: " + getMember(username).getStatus());
     }
 
     public void skipDiary(String username) {
@@ -68,8 +69,8 @@ public class DiaryService {
         diaryRepository.save(diary);
         memberRepository.save(member);
 
-        System.out.println("skipDiary: " + getMember(username).getStatus());
-        System.out.println();
+        MemberEntity test = getMember(username);
+        System.out.println(test.getUsername() + " skipSleep: " + getMember(username).getStatus());
     }
 
     public void writeDiary(String username, DiaryRequest request) {
@@ -100,19 +101,8 @@ public class DiaryService {
         diaryRepository.save(diary);
         memberRepository.save(member);
 
-        System.out.println("writeSleep: " + getMember(username).getStatus());
-    }
-
-    public MonthlyDiaryResponse monthlyDiary(String username, int year, int month) {
-        MemberEntity member = getMember(username);
-
-        if (month < 1 || month > 12) {
-            throw new BadRequestException("month is between 1 and 12");
-        }
-
-        List<MonthlyDiaryEntry> diaries = getDiariesByYearAndMonth(member, year, month);
-        return MonthlyDiaryResponse.builder().diaries(diaries).build();
-
+        MemberEntity test = getMember(username);
+        System.out.println(test.getUsername() + " writeSleep: " + getMember(username).getStatus());
     }
 
 
@@ -176,28 +166,6 @@ public class DiaryService {
         reportResponse.setContent(Emotion.getContent(maxemotion.toLowerCase()));
         reportResponse.setStatus(member.getStatus());
         return reportResponse;
-    }
-
-    private List<MonthlyDiaryEntry> getDiariesByYearAndMonth(MemberEntity member, int year, int month) {
-        List<MonthlyDiaryEntry> filteredDiaries = new ArrayList<>();
-
-        for (DiaryEntity diary : member.getDiaries()) {
-            if (diary.getDate().getYear() == year && diary.getDate().getMonthValue() == month && diary.getEmotion() != null) {
-                MonthlyDiaryEntry response = MonthlyDiaryEntry.builder()
-                        .id(diary.getId())
-                        .date(diary.getDate())
-                        .sleepTime(diary.getSleepTime())
-                        .wakeupTime(diary.getWakeupTime())
-                        .emotion(diary.getEmotion().getDescription())
-                        .title(diary.getTitle())
-                        .content(diary.getContent() == null ? "" : diary.getContent())
-                        .build();
-
-                filteredDiaries.add(response);
-            }
-        }
-
-        return filteredDiaries;
     }
 
     private List<MonthlyDiaryEntry> getDiariesByYearAndMonth(MemberEntity member, int year, int month) {
