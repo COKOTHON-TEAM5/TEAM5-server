@@ -20,8 +20,7 @@ public class JWTUtil {
     }
 
     // 토큰 발급
-    public String generateToken(Long id, String username, Long expiredSec) {
-        long expiredMs = expiredSec * 1000;
+    public String generateToken(Long id, String username) {
         return Jwts.builder()
                 .claim("id", id)
                 .claim("username", username)
@@ -38,16 +37,6 @@ public class JWTUtil {
     // 토큰 유저 이름 추출
     public String getUsername(String token) {
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("username", String.class);
-    }
-
-    // 롤 가져오기
-    public String getRole(String token) {
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("role", String.class);
-    }
-
-    // 발행시간 가져오기
-    public long getIssuedAt(String token) {
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getIssuedAt().getTime();
     }
 
 }
