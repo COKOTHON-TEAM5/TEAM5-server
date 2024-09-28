@@ -1,7 +1,11 @@
 package com.team5.backend.response;
 
+import lombok.Getter;
+
+import java.util.Collections;
 import java.util.Map;
 
+@Getter
 public class StatusResponse extends ResponseDTO {
 
     private static final Map<Integer, StatusCode> codeMap = Map.of(
@@ -12,16 +16,21 @@ public class StatusResponse extends ResponseDTO {
             500, StatusCode.INTERNAL_SERVER_ERROR
     );
 
+    private final Map<String, Object> data;
+
     private StatusResponse(StatusCode statusCode) {
         super(statusCode.getStatus(), statusCode.getMessage());
+        this.data = Collections.emptyMap();
     }
 
     private StatusResponse(StatusCode statusCode, Exception e) {
         super(statusCode.getStatus(), statusCode.getMessage(e));
+        this.data = Collections.emptyMap();
     }
 
     private StatusResponse(StatusCode statusCode, String message) {
-        super(statusCode.getStatus(), statusCode.getMessage() + " - " + message);
+        super(statusCode.getStatus(), message);
+        this.data = Collections.emptyMap();
     }
 
 

@@ -17,19 +17,20 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class AuthInterceptor implements HandlerInterceptor {
 
-    private static final List<String> ALLOWED_PATHS = Arrays.asList("^/member/[^/]*$", "/token");
+    private static final List<String> ALLOWED_PATHS = Arrays.asList("/member/login", "/member/signup", "/member/check-nickname");
     private final JWTUtil jwtUtil;
 
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws IOException {
-        String authHeader = request.getHeader("Authorization");
 
         // 인증이 필요하지 않은 API 통과
         String path = request.getRequestURI();
         if (ALLOWED_PATHS.contains(path)) {
             return true;
         }
+
+        String authHeader = request.getHeader("Authorization");
 
         // Authorization 헤더 검증
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
