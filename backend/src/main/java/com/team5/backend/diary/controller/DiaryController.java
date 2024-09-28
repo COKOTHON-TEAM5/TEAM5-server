@@ -2,11 +2,13 @@ package com.team5.backend.diary.controller;
 
 import com.team5.backend.diary.dto.DiaryRequest;
 import com.team5.backend.diary.dto.MonthlyDiaryResponse;
+import com.team5.backend.diary.dto.ReportResponse;
 import com.team5.backend.diary.dto.TimeRecordRequest;
 import com.team5.backend.diary.service.DiaryService;
 import com.team5.backend.response.DataResponse;
 import com.team5.backend.response.StatusResponse;
 import jakarta.validation.Valid;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,9 +49,9 @@ public class DiaryController {
 
     @GetMapping("report")
     @ResponseBody
-    public StatusResponse reportDiary(@RequestAttribute("username") String username) {
-        diaryService.reportDiary(username);
-        return StatusResponse.of(200);
+    public DataResponse<ReportResponse> reportDiary(@RequestAttribute("username") String username) {
+        ReportResponse reportResponse = diaryService.reportDiary(username);
+        return DataResponse.of(reportResponse);
     }
 
     @GetMapping("monthly")

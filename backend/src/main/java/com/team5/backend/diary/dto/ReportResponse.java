@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @Setter
 
 public class ReportResponse {
-    private long maxcount;
+    private int maxcount;
     private String emotion;
     private String content;
     private int status;

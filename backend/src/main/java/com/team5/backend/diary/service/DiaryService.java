@@ -133,8 +133,9 @@ public class DiaryService {
     public List<DiaryEntity> getLatest30Diaries(MemberEntity member) {
         List<DiaryEntity> diaries = member.getDiaries();
 
-        // 최신순으로 정렬한 후 30개만 가져오기
+        // 최신순으로 정렬한 후, emotion이 null이 아닌 다이어리 중 상위 30개 가져오기
         return diaries.stream()
+                .filter(diary -> diary.getEmotion() != null) // emotion이 null이 아닌 다이어리만 필터링
                 .sorted((d1, d2) -> d2.getDate().compareTo(d1.getDate())) // date로 내림차순 정렬
                 .limit(30) // 상위 30개만 선택
                 .collect(Collectors.toList()); // 결과를 List로 변환
@@ -145,8 +146,8 @@ public class DiaryService {
         List<DiaryEntity> diaries = getLatest30Diaries(member);
         ReportResponse reportResponse = new ReportResponse();
 
-        long max = 0;
-        String maxemotion = null;
+        int max = 0;
+        Emotion maxemotion = null;
 
         // 각 감정별 카운트를 계산
         for (Emotion emotion : Emotion.values()) {
@@ -154,17 +155,25 @@ public class DiaryService {
                     .filter(diary -> diary.getEmotion() == emotion) // 감정 필터링
                     .count(); // 해당 감정의 카운트 계산
 
-            if (count > max) {
-                max = count;
-                maxemotion = emotion.getDescription(); // 감정 설명 가져오기
+            if (((int)count) > max) {
+                max = (int)count;
+                maxemotion = emotion; // 감정 설명 가져오기
 
             }
         }
+        if (max == 0) {
+            reportResponse.setEmotion(""); // 가장 많이 등장한 감정
+            reportResponse.setMaxcount(0); // 해당 감정의 카운트
+            reportResponse.setContent("");
+            reportResponse.setStatus(member.getStatus());
+        }
 
-        reportResponse.setEmotion(maxemotion); // 가장 많이 등장한 감정
-        reportResponse.setMaxcount(max); // 해당 감정의 카운트
-        reportResponse.setContent(Emotion.getContent(maxemotion.toLowerCase()));
-        reportResponse.setStatus(member.getStatus());
+        else{
+            reportResponse.setEmotion(maxemotion.getDescription()); // 가장 많이 등장한 감정
+            reportResponse.setMaxcount(max); // 해당 감정의 카운트
+            reportResponse.setContent(Emotion.getContent(maxemotion.toString()));
+            reportResponse.setStatus(member.getStatus());
+        }
         return reportResponse;
     }
 
