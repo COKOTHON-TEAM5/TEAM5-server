@@ -35,8 +35,8 @@ public class MemberController {
 
     @GetMapping("/check-username") //아이디 중복확인
     @ResponseBody
-    public DataResponse<Boolean> checkNickname(@RequestParam String username) {
-        Boolean isusernameTaken = memberService.isUsernameTaken(username);
-        return DataResponse.of(isusernameTaken);
+    public DataResponse<CheckUsernameResponse> checkNickname(@RequestParam String username) {
+        CheckUsernameResponse checkUsernameResponse = memberService.isUsernameTaken(username);
+        return DataResponse.of(checkUsernameResponse);
     }
 }

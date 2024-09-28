@@ -3,6 +3,7 @@ package com.team5.backend.diary.service;
 import com.team5.backend.diary.domain.DiaryEntity;
 import com.team5.backend.diary.dto.DiaryRequest;
 import com.team5.backend.diary.dto.Emotion;
+import com.team5.backend.diary.dto.ReportResponse;
 import com.team5.backend.diary.dto.TimeRecordRequest;
 import com.team5.backend.diary.repository.DiaryRepository;
 import com.team5.backend.exception.BadRequestException;
@@ -13,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -100,4 +103,38 @@ public class DiaryService {
                 .orElse(null); // 또는 Optional<Diary>로 반환할 수 있음
     }
 
+    public List<DiaryEntity> getLatest30Diaries(MemberEntity member) {
+        List<DiaryEntity> diaries = member.getDiaries();
+
+        // 최신순으로 정렬한 후 30개만 가져오기
+        return diaries.stream()
+                .sorted((d1, d2) -> d2.getDate().compareTo(d1.getDate())) // date로 내림차순 정렬
+                .limit(30) // 상위 30개만 선택
+                .collect(Collectors.toList()); // 결과를 List로 변환
+    }
+
+    public ReportResponse reportDiary(String username) {
+        MemberEntity member = getMember(username);
+        List<DiaryEntity> diaries = getLatest30Diaries(member);
+        ReportResponse reportResponse = new ReportResponse();
+
+        long max = 0;
+        String maxemotion = null;
+
+        // 각 감정별 카운트를 계산
+        for (Emotion emotion : Emotion.values()) {
+            long count = diaries.stream()
+                    .filter(diary -> diary.getEmotion() == emotion) // 감정 필터링
+                    .count(); // 해당 감정의 카운트 계산
+
+            if (count > max) {
+                max = count;
+                maxemotion = emotion.getDescription(); // 감정 설명 가져오기
+            }
+        }
+
+        reportResponse.setEmotion(maxemotion); // 가장 많이 등장한 감정
+        reportResponse.setMaxcount(max); // 해당 감정의 카운트
+        return reportResponse;
+    }
 }

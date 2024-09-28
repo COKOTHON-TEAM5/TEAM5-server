@@ -3,6 +3,7 @@ package com.team5.backend.member.Service;
 import com.team5.backend.exception.NotFoundException;
 import com.team5.backend.exception.UnauthorizedException;
 import com.team5.backend.member.domain.MemberEntity;
+import com.team5.backend.member.dto.CheckUsernameResponse;
 import com.team5.backend.member.dto.LoginRequest;
 import com.team5.backend.member.dto.LoginResponse;
 import com.team5.backend.member.dto.SignupRequest;
@@ -64,9 +65,13 @@ public class MemberService {
     }
 
     // 아이디 중복 확인
-    public boolean isUsernameTaken(String username) {
+    public CheckUsernameResponse isUsernameTaken(String username) {
+        CheckUsernameResponse checkUsernameResponse = new CheckUsernameResponse();
 
-        return memberRepository.countByUsername(username) == 0;
+        if (memberRepository.countByUsername(username) == 0) {
+            checkUsernameResponse.setUniqueness(true);
+        }
+        else checkUsernameResponse.setUniqueness(false);
+        return checkUsernameResponse;
     }
-
 }
