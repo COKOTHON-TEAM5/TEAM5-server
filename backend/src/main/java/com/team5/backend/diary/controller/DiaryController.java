@@ -1,8 +1,10 @@
 package com.team5.backend.diary.controller;
 
 import com.team5.backend.diary.dto.DiaryRequest;
+import com.team5.backend.diary.dto.MonthlyDiaryResponse;
 import com.team5.backend.diary.dto.TimeRecordRequest;
 import com.team5.backend.diary.service.DiaryService;
+import com.team5.backend.response.DataResponse;
 import com.team5.backend.response.StatusResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +49,14 @@ public class DiaryController {
     public StatusResponse reportDiary(@RequestAttribute("username") String username) {
         diaryService.reportDiary(username);
         return StatusResponse.of(200);
+    }
+
+    @GetMapping("monthly")
+    public DataResponse<MonthlyDiaryResponse> monthlyDiary(@RequestAttribute("username") String username,
+                                                           @RequestParam(name = "year") int year,
+                                                           @RequestParam(name = "month") int month) {
+        MonthlyDiaryResponse response = diaryService.monthlyDiary(username, year, month);
+        return DataResponse.of(response);
     }
 
 }

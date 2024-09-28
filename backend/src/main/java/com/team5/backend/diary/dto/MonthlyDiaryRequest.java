@@ -8,13 +8,12 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class DiaryRequest {
+public class MonthlyDiaryRequest {
 
-    @NotEmpty(message = "Emotion is required")
-    private String emotion;
+    @NotEmpty(message = "year is required")
+    private int year;
 
-    private String title;
-
-    private String content;
+    @NotEmpty(message = "month is required")
+    private int month;
 
 }

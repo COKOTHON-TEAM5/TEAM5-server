@@ -1,16 +1,26 @@
 package com.team5.backend.diary.dto;
 
-import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+@Builder
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class DiaryRequest {
+public class MonthlyDiaryEntry {
 
-    @NotEmpty(message = "Emotion is required")
+    private Long id;
+
+    private LocalDate date;
+
+    private LocalDateTime sleepTime;
+    private LocalDateTime wakeupTime;
+
     private String emotion;
 
     private String title;
