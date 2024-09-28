@@ -31,9 +31,8 @@ public class DiaryController {
     }
 
     @PostMapping("skip")
-    public StatusResponse skipDiary(@RequestAttribute("username") String username,
-                                   @RequestBody @Valid TimeRecordRequest request) {
-        diaryService.skipDiary(username, request);
+    public StatusResponse skipDiary(@RequestAttribute("username") String username) {
+        diaryService.skipDiary(username);
         return StatusResponse.of(200);
     }
 

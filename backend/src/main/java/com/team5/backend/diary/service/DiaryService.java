@@ -30,6 +30,7 @@ public class DiaryService {
                 .build();
 
         member.addDiary(diary);
+        diary.setDate(LocalDate.of(2000, 1, 1));
         member.setStatus(1);
 
         diaryRepository.save(diary);
@@ -41,7 +42,7 @@ public class DiaryService {
 
         DiaryEntity diary = getLatestDiary(member);
         diary.setWakeupTime(request.getTime());
-        diary.setDate(LocalDate.of(2000, 1, 1));
+        diary.setDate(request.getTime().toLocalDate());
 
         member.addDiary(diary);
         member.setStatus(2);
@@ -50,20 +51,24 @@ public class DiaryService {
         memberRepository.save(member);
     }
 
-    public void skipDiary(String username, TimeRecordRequest request) {
+    public void skipDiary(String username) {
         MemberEntity member = getMember(username);
 
         DiaryEntity diary = getLatestDiary(member);
         member.setStatus(0);
 
         diaryRepository.save(diary);
+        memberRepository.save(member);
     }
 
     public void writeDiary(String username, DiaryRequest request) {
         MemberEntity member = getMember(username);
 
-        DiaryEntity diary = diaryRepository.findByMemberAndDate(member, request.getDate())
-                .orElseThrow(() -> new NotFoundException("Can't find sleep data"));
+        if (member.getStatus() != 2) {
+            throw new BadRequestException("Sleep and wake up first");
+        }
+
+        DiaryEntity diary = getLatestDiary(member);
 
         if (Emotion.contains(request.getEmotion())) {
             diary.setEmotion(Emotion.valueOf(request.getEmotion()));
