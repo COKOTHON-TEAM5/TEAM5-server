@@ -37,6 +37,9 @@ public class DiaryService {
 
         diaryRepository.save(diary);
         memberRepository.save(member);
+
+        System.out.println(getMember(username).getStatus());
+
     }
 
     public void endSleep(String username, TimeRecordRequest request) {
@@ -51,6 +54,8 @@ public class DiaryService {
 
         diaryRepository.save(diary);
         memberRepository.save(member);
+
+        System.out.println(getMember(username).getStatus());
     }
 
     public void skipDiary(String username) {
@@ -61,6 +66,8 @@ public class DiaryService {
 
         diaryRepository.save(diary);
         memberRepository.save(member);
+
+        System.out.println(getMember(username).getStatus());
     }
 
     public void writeDiary(String username, DiaryRequest request) {
@@ -90,6 +97,8 @@ public class DiaryService {
 
         diaryRepository.save(diary);
         memberRepository.save(member);
+
+        System.out.println(getMember(username).getStatus());
     }
 
     public MonthlyDiaryResponse monthlyDiary(String username, int year, int month) {
