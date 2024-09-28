@@ -13,4 +13,6 @@ import java.time.LocalDate;
 public class ReportResponse {
     private long maxcount;
     private String emotion;
+    private String content;
+    private int status;
 }

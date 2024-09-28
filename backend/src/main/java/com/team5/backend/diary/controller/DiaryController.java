@@ -45,7 +45,8 @@ public class DiaryController {
         return StatusResponse.of(200);
     }
 
-    @PostMapping("report")
+    @GetMapping("report")
+    @ResponseBody
     public StatusResponse reportDiary(@RequestAttribute("username") String username) {
         diaryService.reportDiary(username);
         return StatusResponse.of(200);
