@@ -1,18 +1,24 @@
 package com.team5.backend.member.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import com.team5.backend.diary.domain.DiaryEntity;
+import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Entity
 @Getter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class MemberEntity {
 
     @Id
     @GeneratedValue
     private long id;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DiaryEntity> diaries;
 
     @Column(nullable = false)
     private String username;
@@ -25,6 +31,12 @@ public class MemberEntity {
 
     @Setter
     @Column(nullable = false) //수면상태 (보류)
-    private int status;
+    private int status = 0;
+
+
+    public void addDiary(DiaryEntity diary) {
+        this.diaries.add(diary);
+        diary.setMember(this);
+    }
 
 }
