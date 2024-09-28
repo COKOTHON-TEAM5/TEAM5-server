@@ -1,10 +1,7 @@
 package com.team5.backend.diary.service;
 
 import com.team5.backend.diary.domain.DiaryEntity;
-import com.team5.backend.diary.dto.DiaryRequest;
-import com.team5.backend.diary.dto.Emotion;
-import com.team5.backend.diary.dto.ReportResponse;
-import com.team5.backend.diary.dto.TimeRecordRequest;
+import com.team5.backend.diary.dto.*;
 import com.team5.backend.diary.repository.DiaryRepository;
 import com.team5.backend.exception.BadRequestException;
 import com.team5.backend.exception.NotFoundException;
@@ -14,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -91,6 +89,18 @@ public class DiaryService {
 
     }
 
+    public MonthlyDiaryResponse monthlyDiary(String username, int year, int month) {
+        MemberEntity member = getMember(username);
+
+        if (month < 1 || month > 12) {
+            throw new BadRequestException("month is between 1 and 12");
+        }
+
+        List<MonthlyDiaryEntry> diaries = getDiariesByYearAndMonth(member, year, month);
+        return MonthlyDiaryResponse.builder().diaries(diaries).build();
+
+    }
+
 
     private MemberEntity getMember(String username) {
         return memberRepository.findByUsername(username)
@@ -130,11 +140,36 @@ public class DiaryService {
             if (count > max) {
                 max = count;
                 maxemotion = emotion.getDescription(); // 감정 설명 가져오기
+
             }
         }
 
         reportResponse.setEmotion(maxemotion); // 가장 많이 등장한 감정
         reportResponse.setMaxcount(max); // 해당 감정의 카운트
+        reportResponse.setContent(Emotion.getContent(maxemotion.toLowerCase()));
+        reportResponse.setStatus(member.getStatus());
         return reportResponse;
+    }
+
+    private List<MonthlyDiaryEntry> getDiariesByYearAndMonth(MemberEntity member, int year, int month) {
+        List<MonthlyDiaryEntry> filteredDiaries = new ArrayList<>();
+
+        for (DiaryEntity diary : member.getDiaries()) {
+            if (diary.getDate().getYear() == year && diary.getDate().getMonthValue() == month && diary.getEmotion() != null) {
+                MonthlyDiaryEntry response = MonthlyDiaryEntry.builder()
+                        .id(diary.getId())
+                        .date(diary.getDate())
+                        .sleepTime(diary.getSleepTime())
+                        .wakeupTime(diary.getWakeupTime())
+                        .emotion(diary.getEmotion().getDescription())
+                        .title(diary.getTitle())
+                        .content(diary.getContent() == null ? "" : diary.getContent())
+                        .build();
+
+                filteredDiaries.add(response);
+            }
+        }
+
+        return filteredDiaries;
     }
 }
