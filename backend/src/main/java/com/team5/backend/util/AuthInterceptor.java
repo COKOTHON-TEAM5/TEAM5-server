@@ -17,7 +17,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class AuthInterceptor implements HandlerInterceptor {
 
-    private static final List<String> ALLOWED_PATHS = Arrays.asList("/member/*", "/token");
+    private static final List<String> ALLOWED_PATHS = Arrays.asList("^/member/[^/]*$", "/token");
     private final JWTUtil jwtUtil;
 
 
