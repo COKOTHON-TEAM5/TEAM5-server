@@ -184,10 +184,14 @@ public class DiaryService {
 
         for (DiaryEntity diary : member.getDiaries()) {
             if (diary.getDate().getYear() == year && diary.getDate().getMonthValue() == month && diary.getEmotion() != null) {
+                LocalDateTime end = diary.getWakeupTime();
+                LocalDateTime start = diary.getSleepTime();
+                Duration between = Duration.between(start, end);
+
                 MonthlyDiaryEntry response = MonthlyDiaryEntry.builder()
                         .id(diary.getId())
                         .date(diary.getDate())
-                        .sleepTime(getSleepTime(member))
+                        .sleepTime((int) between.toHours())
                         .emotion(diary.getEmotion().getDescription())
                         .title(diary.getTitle())
                         .content(diary.getContent() == null ? "" : diary.getContent())
