@@ -31,6 +31,7 @@ public class DiaryService {
 
         DiaryEntity diary = DiaryEntity.builder()
                 .sleepTime(request.getTime())
+                .wakeupTime(LocalDateTime.of(2000, 1, 1, 0, 0, 0))
                 .build();
 
         member.addDiary(diary);
@@ -200,11 +201,15 @@ public class DiaryService {
     }
 
     private int getSleepTime(MemberEntity member) {
-        DiaryEntity latestDiary = getLatestDiary(member);
+        DiaryEntity latestDiary = member.getDiaries().stream()
+                .max(Comparator.comparing(DiaryEntity::getWakeupTime))
+                .orElse(null);
         if (latestDiary == null) {
             return 0;
+        } else if (latestDiary.getWakeupTime().equals(LocalDateTime.of(2000, 1, 1, 0, 0, 0))) {
+            return 0;
         }
-        
+
         LocalDateTime end = latestDiary.getWakeupTime();
         LocalDateTime start = latestDiary.getSleepTime();
 
