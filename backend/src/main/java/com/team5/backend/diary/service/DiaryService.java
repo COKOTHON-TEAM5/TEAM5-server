@@ -10,7 +10,9 @@ import com.team5.backend.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -127,7 +129,7 @@ public class DiaryService {
     private DiaryEntity getLatestDiary(MemberEntity member) {
         return member.getDiaries().stream()
                 .max(Comparator.comparing(DiaryEntity::getSleepTime))
-                .orElse(null); // 또는 Optional<Diary>로 반환할 수 있음
+                .orElse(null);
     }
 
     public List<DiaryEntity> getLatest30Diaries(MemberEntity member) {
@@ -165,15 +167,14 @@ public class DiaryService {
             reportResponse.setEmotion(""); // 가장 많이 등장한 감정
             reportResponse.setMaxcount(0); // 해당 감정의 카운트
             reportResponse.setContent("");
-            reportResponse.setStatus(member.getStatus());
-        }
-
-        else{
+        } else{
             reportResponse.setEmotion(maxemotion.getDescription()); // 가장 많이 등장한 감정
             reportResponse.setMaxcount(max); // 해당 감정의 카운트
             reportResponse.setContent(Emotion.getContent(maxemotion.toString()));
-            reportResponse.setStatus(member.getStatus());
         }
+
+        reportResponse.setSleepTime(getSleepTime(member));
+        reportResponse.setStatus(member.getStatus());
         return reportResponse;
     }
 
@@ -185,8 +186,7 @@ public class DiaryService {
                 MonthlyDiaryEntry response = MonthlyDiaryEntry.builder()
                         .id(diary.getId())
                         .date(diary.getDate())
-                        .sleepTime(diary.getSleepTime())
-                        .wakeupTime(diary.getWakeupTime())
+                        .sleepTime(getSleepTime(member))
                         .emotion(diary.getEmotion().getDescription())
                         .title(diary.getTitle())
                         .content(diary.getContent() == null ? "" : diary.getContent())
@@ -197,6 +197,19 @@ public class DiaryService {
         }
 
         return filteredDiaries;
+    }
+
+    private int getSleepTime(MemberEntity member) {
+        DiaryEntity latestDiary = getLatestDiary(member);
+        if (latestDiary == null) {
+            return 0;
+        }
+        
+        LocalDateTime end = latestDiary.getWakeupTime();
+        LocalDateTime start = latestDiary.getSleepTime();
+
+        Duration between = Duration.between(start, end);
+        return (int) between.toHours();
     }
 
 }
